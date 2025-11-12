@@ -29,3 +29,25 @@ CREATE TABLE club_member_info_cleaned (
 ## Copy all value from original table
 INSERT INTO club_member_info_cleaned
 SELECT * FROM club_member_info 
+## Clean data 
+### Clean full_name column
+UPDATE club_member_info_cleaned 
+SET full_name = TRIM (full_name);
+
+UPDATE club_member_info_cleaned 
+SET full_name = UPPER (full_name);
+### Cleaned age column
+UPDATE club_member_info_cleaned 
+SET age = (SELECT MEDIAN(age) FROM club_member_info_cleaned)
+WHERE age = '' OR age >= 99;
+### Cleaned martial_status column
+SELECT DISTINCT(martial_status)
+FROm club_member_info_cleaned
+
+UPDATE club_member_info_cleaned
+SET martial_status = 'divorced'
+WHERE martial_status = 'divored'
+
+UPDATE club_member_info_cleaned
+SET martial_status = 'missing'
+WHERE martial_status = ''
