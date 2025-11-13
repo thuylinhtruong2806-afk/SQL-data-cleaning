@@ -1,7 +1,7 @@
 # SQL-data-cleaning
 This is an educational project on data cleaning and preparation using SQL. The original database in CSV format is located in the file club_member_info.csv. Here, we will explore the steps that need to be applied to obtain a cleansed version of the dataset.
 ## Data Overview
-SELECT * FROM club_member_infor cmi
+SELECT * FROM club_member_infor cmi  
 LIMIT 10
 |full_name|age|martial_status|email|phone|full_address|job_title|membership_date|
 |---------|---|--------------|-----|-----|------------|---------|---------------|
@@ -16,38 +16,51 @@ LIMIT 10
 |mendie alexandrescu|46|single|malexandrescu8@state.gov|504-918-4753|34 Delladonna Terrace,New Orleans,Louisiana|Systems Administrator III|3/12/1921|
 | fey kloss|52|married|fkloss9@godaddy.com|808-177-0318|8976 Jackson Park,Honolulu,Hawaii|Chemical Engineer|11/5/2014|
 ## Create a new table for cleaning
-CREATE TABLE club_member_info_cleaned (
-	full_name VARCHAR(50),
-	age INTEGER,
-	martial_status VARCHAR(50),
-	email VARCHAR(50),
-	phone VARCHAR(50),
-	full_address VARCHAR(50),
-	job_title VARCHAR(50),
-	membership_date VARCHAR(50)
-);
-## Copy all value from original table
-INSERT INTO club_member_info_cleaned
-SELECT * FROM club_member_info 
+CREATE TABLE club_member_info_cleaned (  
+	full_name VARCHAR(50),  
+	age INTEGER,  
+	martial_status VARCHAR(50),  
+	email VARCHAR(50),  
+	phone VARCHAR(50),  
+	full_address VARCHAR(50),  
+	job_title VARCHAR(50),  
+	membership_date VARCHAR(50)  
+);  
+## Copy all value from original table  
+INSERT INTO club_member_info_cleaned  
+SELECT * FROM club_member_info   
+
 ## Clean data 
 ### Clean full_name column
-UPDATE club_member_info_cleaned 
-SET full_name = TRIM (full_name);
+UPDATE club_member_info_cleaned   
+SET full_name = TRIM (full_name);  
 
-UPDATE club_member_info_cleaned 
-SET full_name = UPPER (full_name);
-### Cleaned age column
-UPDATE club_member_info_cleaned 
-SET age = (SELECT MEDIAN(age) FROM club_member_info_cleaned)
-WHERE age = '' OR age >= 99;
-### Cleaned martial_status column
-SELECT DISTINCT(martial_status)
-FROm club_member_info_cleaned
+UPDATE club_member_info_cleaned  
+SET full_name = UPPER (full_name);  
 
-UPDATE club_member_info_cleaned
-SET martial_status = 'divorced'
-WHERE martial_status = 'divored'
+### Clean age column
+UPDATE club_member_info_cleaned  
+SET age = (SELECT MEDIAN(age) FROM club_member_info_cleaned)  
+WHERE age = '' OR age >= 99;  
+### Clean martial_status column
+SELECT DISTINCT(martial_status)  
+FROM club_member_info_cleaned  
 
-UPDATE club_member_info_cleaned
-SET martial_status = 'missing'
-WHERE martial_status = ''
+UPDATE club_member_info_cleaned  
+SET martial_status = 'divorced'  
+WHERE martial_status = 'divored'  
+
+UPDATE club_member_info_cleaned  
+SET martial_status = 'missing'  
+WHERE martial_status = ''  
+### Clean job_title column
+UPDATE club_member_info_cleaned  
+SET job_title = (  
+  SELECT job_title  
+  FROM club_member_info_cleaned  
+  WHERE job_title IS NOT NULL AND job_title <> ''  
+  GROUP BY job_title  
+  ORDER BY COUNT(*) DESC  
+  LIMIT 1  
+)
+WHERE job_title IS NULL OR job_title = '';  
